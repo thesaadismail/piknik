@@ -7,11 +7,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
+ * Menubar for the Piknik application.
  * Created by sismail on 8/28/14.
  */
-
 public class PiknikMenuBar extends JMenuBar
 {
+    /**
+     * The parent frame that this base panel is contained in. For this application the parentFrame will always be
+     * an instance of PiknikWindow
+     */
     private PiknikWindow parentFrame;
 
     public PiknikMenuBar(PiknikWindow parentFrame)
@@ -22,6 +26,9 @@ public class PiknikMenuBar extends JMenuBar
         setUpMenuBar();
     }
 
+    /**
+     * Sets up the two menus (File and View) and creates the separate menu items for each of those menus.
+     */
     private void setUpMenuBar()
     {
         Color menuBarBackgroundColor = new Color(0xDADADA);

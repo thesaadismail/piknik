@@ -27,6 +27,13 @@ public class PiknikToolbar extends PiknikBasePanel
         super(parentFrame, width, height);
     }
 
+    /**
+     * Implementation of abstract setup methods. This will set the preferred size, set background color, border, and
+     * call helper setup methods.
+     *
+     * @param width the preferred width of the current panel
+     * @param height the preferred height of the current panel
+     */
     protected void setup(int width, int height)
     {
         setLayout(new BorderLayout());
@@ -40,6 +47,10 @@ public class PiknikToolbar extends PiknikBasePanel
         setupNavigationButtons();
     }
 
+    /**
+     * Helper setup method to create the previous/next navigation buttons. Navigation Buttons are setup inside of a
+     * JPanel with a FlowLayout. This JPanel is added to the PiknikToolbar Panel at the location BorderLayout.SOUTH.
+     */
     private void setupNavigationButtons()
     {
         JPanel navigationButtonPanel = new JPanel();
@@ -83,7 +94,12 @@ public class PiknikToolbar extends PiknikBasePanel
         add(navigationButtonPanel, BorderLayout.SOUTH);
     }
 
-
+    /**
+     * Helper setup method to create the tags (e.g. Travel, Work, etc). The layout for this screen is complex.
+     * It starts off with an overall JPanel with a BorderLayout. This JPanel will contain a JLabel with the text "TAGS"
+     * at the location BorderLayout.NORTH. At BorderLayout.CENTER, another JPanel will be created and added to that
+     * area. This sub JPanel will have a GridLayout and display the tags  through JToggleButtons.
+     */
     private void setupTags()
     {
         JPanel tagsPanel = new JPanel();
@@ -124,6 +140,9 @@ public class PiknikToolbar extends PiknikBasePanel
         add(tagsPanel, BorderLayout.NORTH);
     }
 
+    /**
+     * Generic Tags Action Listener. The JToggleButton will need to be passed in to determine which button was pressed.
+     */
     private class TagsActionListener implements ActionListener
     {
         JToggleButton tagToggleButton;
