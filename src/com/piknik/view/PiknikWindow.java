@@ -14,6 +14,8 @@ public class PiknikWindow extends JFrame
     private PiknikStatusBar statusBar;
 
     //SIZE PROPERTIES of PiknikWindow
+    private final int MIN_WIDTH = 580;
+    private final int MIN_HEIGHT = 300;
     private final int WIDTH = 800;
     private final int HEIGHT = 600;
 
@@ -40,7 +42,7 @@ public class PiknikWindow extends JFrame
         getContentPane().add(statusBar, BorderLayout.SOUTH);
 
         //sets the minimum size to half the dimensions
-        setMinimumSize(new Dimension(WIDTH/2,HEIGHT/2));
+        setMinimumSize(new Dimension(MIN_WIDTH,MIN_HEIGHT));
 
         //setting close operation
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
