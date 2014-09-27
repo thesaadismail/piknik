@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * Created by sismail on 8/28/14.
@@ -38,10 +38,11 @@ public class PiknikToolbar extends PiknikBasePanel
     {
         setLayout(new BorderLayout());
 
-        setPreferredSize(new Dimension(250, 100));
+        setPreferredSize(new Dimension(width, height));
         setBackground(Color.WHITE);
 
-        setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, Color.lightGray));
+        Color borderColor = new Color(0XE6E6E6);
+        setBorder(BorderFactory.createMatteBorder(0, 0, 0, 5, borderColor));
 
         setupTags();
         setupNavigationButtons();
@@ -59,8 +60,10 @@ public class PiknikToolbar extends PiknikBasePanel
         BufferedImage backButtonOriginalImage = null;
         BufferedImage forwardButtonOriginalImage = null;
         try {
-            backButtonOriginalImage = ImageIO.read(new File(getClass().getResource("/resources/ico_back.png").toURI()));
-            forwardButtonOriginalImage = ImageIO.read(new File(getClass().getResource("/resources/ico_forward.png").toURI()));
+            InputStream backButtonURL = getClass().getClassLoader().getResourceAsStream("resources/ico_back.png");
+            InputStream forwardButtonURL = getClass().getClassLoader().getResourceAsStream("resources/ico_forward.png");
+            backButtonOriginalImage = ImageIO.read(backButtonURL);
+            forwardButtonOriginalImage = ImageIO.read(forwardButtonURL);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,6 +95,12 @@ public class PiknikToolbar extends PiknikBasePanel
         navigationButtonPanel.add(forwardButton);
 
         add(navigationButtonPanel, BorderLayout.SOUTH);
+    }
+
+    public static java.net.URL getFileAsURL(javax.swing.JComponent parent , String path)
+    {
+        java.net.URLClassLoader urlLoader = (java.net.URLClassLoader) parent.getClass().getClassLoader();
+        return urlLoader.findResource(path);
     }
 
     /**

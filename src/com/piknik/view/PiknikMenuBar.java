@@ -54,7 +54,7 @@ public class PiknikMenuBar extends JMenuBar
                 else
                 {
                     //action was cancelled by the user
-                    parentFrame.updateStatus("Cancelled Import");
+                    parentFrame.updateStatus("Canceled Import");
                 }
 
             }

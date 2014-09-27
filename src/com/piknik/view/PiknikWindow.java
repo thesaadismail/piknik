@@ -14,32 +14,33 @@ public class PiknikWindow extends JFrame
     private PiknikStatusBar statusBar;
 
     //SIZE PROPERTIES of PiknikWindow
-    private final int MIN_WIDTH = 580;
+    private final int MIN_WIDTH = 680;
     private final int MIN_HEIGHT = 300;
-    private final int WIDTH = 800;
+    private final int WIDTH = 900;
     private final int HEIGHT = 600;
 
     public PiknikWindow()
     {
         super("Piknik");
 
-        getContentPane().setBackground(Color.YELLOW);
-
         menuBar = new PiknikMenuBar(this);
 
         setJMenuBar(menuBar);
 
         //instantiates and adds a PiknikToolbar (contains tags and navigation buttons) to BorderLayout.WEST
-        toolbarArea    = new PiknikToolbar(this, WIDTH, HEIGHT);
+        toolbarArea    = new PiknikToolbar(this, 250, 100);
         getContentPane().add(toolbarArea, BorderLayout.WEST);
 
         //instantiates and adds a PiknikContentArea (contains an empty JPanel for now) to BorderLayout.CENTER
-        contentArea = new PiknikContentArea(this, WIDTH, HEIGHT);
+        contentArea = new PiknikContentArea(this, 650, 475);
         getContentPane().add(contentArea, BorderLayout.CENTER);
 
         //instantiates and adds a PiknikStatusBar (contains a JLabel) to BorderLayout.SOUTH
-        statusBar = new PiknikStatusBar(this, WIDTH, HEIGHT);
+        statusBar = new PiknikStatusBar(this, WIDTH, 25);
         getContentPane().add(statusBar, BorderLayout.SOUTH);
+
+        //set preferred size
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         //sets the minimum size to half the dimensions
         setMinimumSize(new Dimension(MIN_WIDTH,MIN_HEIGHT));

@@ -26,37 +26,24 @@ public class PiknikStatusBar extends PiknikBasePanel
      */
     public void setup(int width, int height)
     {
-        Color statusBarBackgroundColor = new Color(0xBFBFBF);
+        Color statusBarBackgroundColor = new Color(0xE6E6E6);
 
-        setPreferredSize(new Dimension(WIDTH, 25));
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setPreferredSize(new Dimension(width, height));
         setBackground(statusBarBackgroundColor);
 
         statusBarLabel = new JLabel("No Status");
-        //Border paddingBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-        //statusBarLabel.setBorder(paddingBorder);
-        //statusBarLabel.setPreferredSize(new Dimension(WIDTH, 25));
 
         add(statusBarLabel, BorderLayout.CENTER);
     }
 
     /**
-     * SetStatus will set the label text to the string that was passed in. It will also start a timer for 10 seconds
-     * and clear the status back to "No Status" after that time has passed.
+     * SetStatus will set the label text to the string that was passed in.
      * @param statusText the status that needs to be displayed
      */
     protected void setStatus(String statusText)
     {
         statusBarLabel.setText(statusText);
-
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        statusBarLabel.setText("No Status");
-                    }
-                },
-                10000
-        );
     }
 
 
