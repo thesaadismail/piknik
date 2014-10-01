@@ -1,7 +1,5 @@
 package com.piknik.view.custom;
 
-import com.piknik.model.LineAnnotation;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -17,7 +15,7 @@ public class PhotoComponent extends JComponent
     private boolean isFlipped;
     private boolean isTyping;
     private Image image;
-    private ArrayList<ArrayList<LineAnnotation>> annotationPointGroups;
+    private ArrayList<ArrayList<Point>> annotationPointGroups;
     private ArrayList<SimpleEntry<Point, String>> textAnnotationsList;
 
     public PhotoComponent(Image img)
