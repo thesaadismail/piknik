@@ -1,6 +1,12 @@
 package com.piknik.view;
 
+import com.piknik.view.custom.PhotoComponent;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 /**
  * Created by sismail on 8/28/14.
@@ -22,6 +28,25 @@ public class PiknikContentArea extends PiknikBasePanel {
     protected void setup(int width, int height)
     {
         setPreferredSize(new Dimension(width, height));
-        setBackground(Color.WHITE);
+        setBackground(Color.white);
+
+        setLayout(new BorderLayout());
+
+        PhotoComponent component = new PhotoComponent(retrieveImage("android-logo.jpg"));
+        JScrollPane scrollPane = new JScrollPane(component);
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    public Image retrieveImage(String imageName)
+    {
+        BufferedImage originalImage = null;
+        try {
+            InputStream imageURL = getClass().getClassLoader().getResourceAsStream("resources/"+imageName);
+            originalImage = ImageIO.read(imageURL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return originalImage;
     }
 }
