@@ -1,5 +1,7 @@
 package com.piknik.view;
 
+import com.piknik.global.PhotoControlSettings;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -46,6 +48,7 @@ public class PiknikToolbar extends PiknikBasePanel
 
         setupTags();
         setupNavigationButtons();
+        setupPhotoControls();
     }
 
     /**
@@ -114,7 +117,7 @@ public class PiknikToolbar extends PiknikBasePanel
         JPanel tagsPanel = new JPanel();
         tagsPanel.setLayout(new BorderLayout());
 
-        JLabel tagsLabel = new JLabel("TAGS");
+        JLabel tagsLabel = new JLabel("Tags");
         tagsLabel.setFont(new Font("Serif", Font.PLAIN, 18));
         Border paddingBorder = BorderFactory.createEmptyBorder(5,0,10,0);
         tagsLabel.setBorder(paddingBorder);
@@ -149,6 +152,98 @@ public class PiknikToolbar extends PiknikBasePanel
         add(tagsPanel, BorderLayout.NORTH);
     }
 
+    private void setupPhotoControls()
+    {
+        JPanel photoControls = new JPanel();
+        photoControls.setLayout(new BorderLayout());
+
+        //photoControls.add(controlsLabel, BorderLayout.NORTH);
+
+        JPanel specificControlsPanel = new JPanel();
+        GridLayout experimentLayout = new GridLayout(3,2);
+        specificControlsPanel.setLayout(experimentLayout);
+
+        //create photo controls label. somewhat of a hack to fit this with GridLayouts.
+        //an alternative would be to use gridbag layouts
+        Border paddingBorder = BorderFactory.createEmptyBorder(5,0,10,0);
+
+        JLabel controlsLabel1 = new JLabel("Photo ");
+        controlsLabel1.setFont(new Font("Serif", Font.PLAIN, 18));
+        controlsLabel1.setBorder(paddingBorder);
+        controlsLabel1.setHorizontalAlignment(JLabel.RIGHT);
+        controlsLabel1.setVerticalAlignment(JLabel.CENTER);
+
+        JLabel controlsLabel2 = new JLabel("Controls");
+        controlsLabel2.setFont(new Font("Serif", Font.PLAIN, 18));
+        controlsLabel2.setBorder(paddingBorder);
+        controlsLabel2.setHorizontalAlignment(JLabel.LEFT);
+        controlsLabel2.setVerticalAlignment(JLabel.CENTER);
+
+        specificControlsPanel.add(controlsLabel1);
+        specificControlsPanel.add(controlsLabel2);
+
+        //add buttons and labels for line color and text color
+        Border buttonPaddingBorder = BorderFactory.createEmptyBorder(0,5,0,0);
+
+        //create line color label
+        JLabel lineColorLabel = new JLabel("Line Color: ");
+        lineColorLabel.setHorizontalAlignment(JLabel.CENTER);
+        specificControlsPanel.add(lineColorLabel);
+
+        //create line color button
+        final JButton lineColorButton = new JButton(getHex(PhotoControlSettings.lineAnnotationColor));
+        lineColorButton.setBorder(buttonPaddingBorder);
+
+        //set line color button background and its properties
+        lineColorButton.setBackground(PhotoControlSettings.lineAnnotationColor);
+        lineColorButton.setContentAreaFilled(false);
+        lineColorButton.setOpaque(true);
+
+        lineColorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color selectedColor = JColorChooser.showDialog(PiknikToolbar.this, "Pick a Color", PhotoControlSettings.lineAnnotationColor);
+                PhotoControlSettings.lineAnnotationColor = selectedColor;
+                lineColorButton.setText(getHex(selectedColor));
+                lineColorButton.setBackground(selectedColor);
+            }
+        });
+        specificControlsPanel.add(lineColorButton);
+
+        //create text color label
+        JLabel textColorLabel = new JLabel("Text Color: ");
+        textColorLabel.setHorizontalAlignment(JLabel.CENTER);
+        specificControlsPanel.add(textColorLabel);
+
+        //create text color button
+        final JButton textColorButton = new JButton(getHex(PhotoControlSettings.textAnnotationColor));
+        textColorButton.setBorder(buttonPaddingBorder);
+
+        //set text color button background
+        textColorButton.setBackground(PhotoControlSettings.textAnnotationColor);
+        textColorButton.setContentAreaFilled(false);
+        textColorButton.setOpaque(true);
+
+        textColorButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Color selectedColor = JColorChooser.showDialog(PiknikToolbar.this, "Pick a Color", PhotoControlSettings.textAnnotationColor);
+                PhotoControlSettings.textAnnotationColor = selectedColor;
+                textColorButton.setText(getHex(selectedColor));
+
+                textColorButton.setBackground(selectedColor);
+                textColorButton.setContentAreaFilled(false);
+                textColorButton.setOpaque(true);
+            }
+        });
+        specificControlsPanel.add(textColorButton);
+
+        photoControls.add(specificControlsPanel, BorderLayout.NORTH);
+
+        JScrollPane photoControlsScrollPane = new JScrollPane(photoControls);
+        add(photoControlsScrollPane, BorderLayout.CENTER);
+    }
+
     /**
      * Generic Tags Action Listener. The JToggleButton will need to be passed in to determine which button was pressed.
      */
@@ -172,4 +267,10 @@ public class PiknikToolbar extends PiknikBasePanel
             }
         }
     }
+
+    private String getHex(Color color)
+    {
+        return "#" + String.format("%06x", color.getRGB() & 0x00FFFFFF);
+    }
+
 }

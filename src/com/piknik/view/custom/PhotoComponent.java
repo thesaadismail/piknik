@@ -1,9 +1,12 @@
 package com.piknik.view.custom;
 
+import com.piknik.global.PhotoControlSettings;
+import com.piknik.model.DotAnnotation;
+import com.piknik.model.TextAnnotation;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 
 /**
@@ -15,8 +18,8 @@ public class PhotoComponent extends JComponent
     private boolean isFlipped;
     private boolean isTyping;
     private Image image;
-    private ArrayList<ArrayList<Point>> annotationPointGroups;
-    private ArrayList<SimpleEntry<Point, String>> textAnnotationsList;
+    private ArrayList<ArrayList<DotAnnotation>> lineAnnotationGroups;
+    private ArrayList<TextAnnotation> textAnnotationsList;
 
     public PhotoComponent(Image img)
     {
@@ -24,8 +27,11 @@ public class PhotoComponent extends JComponent
         this.setBackground(Color.yellow);
         this.setPreferredSize(new Dimension(image.getWidth(null), image.getHeight(null)));
 
-        this.textAnnotationsList = new ArrayList<SimpleEntry<Point, String>>();
-        this.annotationPointGroups = new ArrayList<ArrayList<Point>>();
+        //create textAnnotationsList for textAnnotations
+        this.textAnnotationsList = new ArrayList<TextAnnotation>();
+
+        //create line annotation groups for groups of a list of dots
+        this.lineAnnotationGroups = new ArrayList<ArrayList<DotAnnotation>>();
 
         addMouseListener(new ComponentMouseListener());
         addMouseMotionListener(new ComponentMouseMotionListener());
@@ -65,32 +71,36 @@ public class PhotoComponent extends JComponent
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHints (rh);
 
-        g.setColor(Color.blue);
-        for(int i = 0; i<annotationPointGroups.size(); i++)
+        for(int i = 0; i<lineAnnotationGroups.size(); i++)
         {
-            ArrayList<Point> annotationPoints = annotationPointGroups.get(i);
+            ArrayList<DotAnnotation> annotationPoints = lineAnnotationGroups.get(i);
             for(int j = 1; j<annotationPoints.size(); j++)
             {
-                Point firstPoint = annotationPoints.get(j-1);
-                Point secondPoint = annotationPoints.get(j);
-                g.drawLine(imageCoordinates.x+firstPoint.x, imageCoordinates.y+firstPoint.y,
-                        imageCoordinates.x+secondPoint.x, imageCoordinates.y+secondPoint.y);
+                DotAnnotation firstPoint = annotationPoints.get(j-1);
+                DotAnnotation secondPoint = annotationPoints.get(j);
+
+                //user the color of the second dot. the order shouldn't matter too much since as you are drawing
+                //you are unable to change the color of the line.
+                g.setColor(secondPoint.annotationColor);
+                g.drawLine(imageCoordinates.x+firstPoint.annotationCoordinates.x, imageCoordinates.y+firstPoint.annotationCoordinates.y,
+                        imageCoordinates.x+secondPoint.annotationCoordinates.x, imageCoordinates.y+secondPoint.annotationCoordinates.y);
             }
         }
     }
 
     private void drawTextAnnotations(Graphics g)
     {
-        g.setColor(Color.DARK_GRAY);
 
         Point imageCoordinates = getImageStartingCoordinates();
         int imageRightX = imageCoordinates.x + image.getWidth(null);
 
         for(int i = 0; i<textAnnotationsList.size(); i++)
         {
-            SimpleEntry<Point, String> textAnnotation = textAnnotationsList.get(i);
-            Point textAnnotationPoint = textAnnotation.getKey();
-            String textAnnotationString = textAnnotation.getValue();
+            TextAnnotation textAnnotation = textAnnotationsList.get(i);
+            g.setColor(textAnnotation.annotationColor);
+
+            Point textAnnotationPoint = textAnnotation.annotationCoordinates;
+            String textAnnotationString = textAnnotation.text;
 
             //if the user is currently typing and we are at the last textAnnotation then add a cursor at the end
             if(isTyping && i == textAnnotationsList.size()-1)
@@ -135,7 +145,10 @@ public class PhotoComponent extends JComponent
                             absoluteYValueForTextAnnotation += 15;
                             if(absoluteYValueForTextAnnotation > (image.getWidth(null) + imageCoordinates.y))
                             {
-                                absoluteYValueForTextAnnotation = 2;
+                                if(absoluteYValueForTextAnnotation >= imageCoordinates.y)
+                                    textAnnotation.annotationCoordinates.y = textAnnotation.annotationCoordinates.y - 15;
+                                break;
+                                //absoluteYValueForTextAnnotation = 2;
                             }
 
                             //go back an iteration to process the element again
@@ -220,9 +233,9 @@ public class PhotoComponent extends JComponent
     {
         //check the annotationPointGroups list to see if the last list is empty
         //if its not empty, create a new empty grouping
-        if(annotationPointGroups.size() == 0 || annotationPointGroups.get(annotationPointGroups.size()-1).size() != 0)
+        if(lineAnnotationGroups.size() == 0 || lineAnnotationGroups.get(lineAnnotationGroups.size()-1).size() != 0)
         {
-            annotationPointGroups.add(new ArrayList<Point>());
+            lineAnnotationGroups.add(new ArrayList<DotAnnotation>());
         }
     }
 
@@ -267,10 +280,10 @@ public class PhotoComponent extends JComponent
             }
             else if((int)e.getKeyChar() == 8)
             {
-                SimpleEntry<Point, String> text = textAnnotationsList.get(textAnnotationsList.size()-1);
-                if(text.getValue().length() > 0)
+                TextAnnotation textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
+                if(textAnnotation.text.length() > 0)
                 {
-                    text.setValue(text.getValue().substring(0, text.getValue().length()-1));
+                    textAnnotation.text = textAnnotation.text.substring(0, textAnnotation.text.length()-1);
                     repaint();
                 }
             }
@@ -278,8 +291,8 @@ public class PhotoComponent extends JComponent
             {
                 if(textAnnotationsList.size() > 0)
                 {
-                    SimpleEntry<Point, String> textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
-                    textAnnotation.setValue(textAnnotation.getValue()+e.getKeyChar());
+                    TextAnnotation textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
+                    textAnnotation.text = (textAnnotation.text+e.getKeyChar());
                     repaint();
                 }
             }
@@ -346,7 +359,21 @@ public class PhotoComponent extends JComponent
                     requestFocusInWindow();
 
                     isTyping = true;
-                    textAnnotationsList.add(new SimpleEntry<Point, String>(relativeClickedPoint, ""));
+
+                    TextAnnotation textAnnotation;
+                    if(textAnnotationsList.size()!=0 &&
+                            textAnnotationsList.get(textAnnotationsList.size()-1).text.equals(""))
+                    {
+                        textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
+                        textAnnotation.annotationCoordinates = relativeClickedPoint;
+                        textAnnotation.annotationColor = PhotoControlSettings.textAnnotationColor;
+                    }
+                    else
+                    {
+                        textAnnotation = new TextAnnotation(relativeClickedPoint, "");
+                        textAnnotationsList.add(textAnnotation);
+                        textAnnotation.annotationColor = PhotoControlSettings.textAnnotationColor;
+                    }
 
                     repaint();
                 }
@@ -366,8 +393,10 @@ public class PhotoComponent extends JComponent
                 Point imageStartingCoordinates = getImageStartingCoordinates();
                 Point relativeClickedPoint = new Point(e.getX()-imageStartingCoordinates.x,e.getY()-imageStartingCoordinates.y);
 
-                ArrayList<Point> annotationPoints = annotationPointGroups.get(annotationPointGroups.size()-1);
-                annotationPoints.add(relativeClickedPoint);
+                ArrayList<DotAnnotation> annotationPoints = lineAnnotationGroups.get(lineAnnotationGroups.size()-1);
+                DotAnnotation dot = new DotAnnotation(relativeClickedPoint);
+                dot.annotationColor = PhotoControlSettings.lineAnnotationColor;
+                annotationPoints.add(dot);
                 repaint();
             }
             else

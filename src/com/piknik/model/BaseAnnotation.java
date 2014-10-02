@@ -9,6 +9,11 @@ public class BaseAnnotation {
 
     public Point annotationCoordinates;
     public Color annotationColor;
-    public Font annotationFontStyle;
+
+    public BaseAnnotation(Point coordinates)
+    {
+        this.annotationCoordinates = coordinates;
+    }
+
 
 }
