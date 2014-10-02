@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 /**
  * Menubar for the Piknik application.
@@ -50,6 +51,8 @@ public class PiknikMenuBar extends JMenuBar
                 if (returnVal == JFileChooser.APPROVE_OPTION)
                 {
                     parentFrame.updateStatus("File was Selected for Import");
+                    File file = fc.getSelectedFile();
+                    parentFrame.setImageInContentArea(file);
                 }
                 else
                 {
@@ -64,7 +67,8 @@ public class PiknikMenuBar extends JMenuBar
         JMenuItem deleteMenuItem = new JMenuItem("Delete",KeyEvent.VK_D);
         deleteMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                parentFrame.updateStatus("Photo Has Been Deleted");
+                parentFrame.updateStatus("Photo Has Been Removed from Piknik");
+                parentFrame.removeImageFromContentArea();
             }
         });
         fileMenu.add(deleteMenuItem);

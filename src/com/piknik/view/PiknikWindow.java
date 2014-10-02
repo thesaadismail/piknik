@@ -1,7 +1,11 @@
 package com.piknik.view;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by sismail on 8/28/14.
@@ -62,5 +66,28 @@ public class PiknikWindow extends JFrame
     {
         statusBar.setStatus(status);
     }
+
+    public void setImageInContentArea(File file)
+    {
+        try {
+            BufferedImage bufferedImage = ImageIO.read(file);
+            if(bufferedImage != null)
+            {
+                this.contentArea.setImage(bufferedImage);
+            }
+            else
+            {
+                updateStatus("ERROR: File selected for import is not an image.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeImageFromContentArea()
+    {
+        this.contentArea.removeImage();
+    }
+
 
 }

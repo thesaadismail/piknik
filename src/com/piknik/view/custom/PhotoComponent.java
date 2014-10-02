@@ -90,7 +90,6 @@ public class PhotoComponent extends JComponent
 
     private void drawTextAnnotations(Graphics g)
     {
-
         Point imageCoordinates = getImageStartingCoordinates();
         int imageRightX = imageCoordinates.x + image.getWidth(null);
 
@@ -145,10 +144,13 @@ public class PhotoComponent extends JComponent
                             absoluteYValueForTextAnnotation += 15;
                             if(absoluteYValueForTextAnnotation > (image.getWidth(null) + imageCoordinates.y))
                             {
+                                //only if the y value does not go before the top of the image then move the text box up
+                                //if it does go above, then do not do anything for now. this was a design decision,
+                                //as to what needs to be done if the text keeps on moving up due to size
+                                //for now i have decided to not allow the user to see the addition text he is typing.
                                 if(absoluteYValueForTextAnnotation >= imageCoordinates.y)
                                     textAnnotation.annotationCoordinates.y = textAnnotation.annotationCoordinates.y - 15;
                                 break;
-                                //absoluteYValueForTextAnnotation = 2;
                             }
 
                             //go back an iteration to process the element again
@@ -272,28 +274,30 @@ public class PhotoComponent extends JComponent
 
         @Override
         public void keyTyped(KeyEvent e) {
-
-            if((int)e.getKeyChar() == 27)
+            if(isFlipped)
             {
-                isTyping = false;
-                repaint();
-            }
-            else if((int)e.getKeyChar() == 8)
-            {
-                TextAnnotation textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
-                if(textAnnotation.text.length() > 0)
+                if((int)e.getKeyChar() == 27)
                 {
-                    textAnnotation.text = textAnnotation.text.substring(0, textAnnotation.text.length()-1);
+                    isTyping = false;
                     repaint();
                 }
-            }
-            else if(isTyping)
-            {
-                if(textAnnotationsList.size() > 0)
+                else if((int)e.getKeyChar() == 8)
                 {
                     TextAnnotation textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
-                    textAnnotation.text = (textAnnotation.text+e.getKeyChar());
-                    repaint();
+                    if(textAnnotation.text.length() > 0)
+                    {
+                        textAnnotation.text = textAnnotation.text.substring(0, textAnnotation.text.length()-1);
+                        repaint();
+                    }
+                }
+                else if(isTyping)
+                {
+                    if(textAnnotationsList.size() > 0)
+                    {
+                        TextAnnotation textAnnotation = textAnnotationsList.get(textAnnotationsList.size()-1);
+                        textAnnotation.text = (textAnnotation.text+e.getKeyChar());
+                        repaint();
+                    }
                 }
             }
         }
@@ -386,24 +390,27 @@ public class PhotoComponent extends JComponent
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            Point point = new Point(e.getX(), e.getY());
-
-            if(isCoordinateInImage(point))
+            if(isFlipped)
             {
-                Point imageStartingCoordinates = getImageStartingCoordinates();
-                Point relativeClickedPoint = new Point(e.getX()-imageStartingCoordinates.x,e.getY()-imageStartingCoordinates.y);
+                Point point = new Point(e.getX(), e.getY());
 
-                ArrayList<DotAnnotation> annotationPoints = lineAnnotationGroups.get(lineAnnotationGroups.size()-1);
-                DotAnnotation dot = new DotAnnotation(relativeClickedPoint);
-                dot.annotationColor = PhotoControlSettings.lineAnnotationColor;
-                annotationPoints.add(dot);
-                repaint();
-            }
-            else
-            {
-                //if coordinate is not in image, then create a new grouping so if the user does come back in the image
-                //the line does not connect from where the user left off
-                createNewPointGrouping();
+                if(isCoordinateInImage(point))
+                {
+                    Point imageStartingCoordinates = getImageStartingCoordinates();
+                    Point relativeClickedPoint = new Point(e.getX()-imageStartingCoordinates.x,e.getY()-imageStartingCoordinates.y);
+
+                    ArrayList<DotAnnotation> annotationPoints = lineAnnotationGroups.get(lineAnnotationGroups.size()-1);
+                    DotAnnotation dot = new DotAnnotation(relativeClickedPoint);
+                    dot.annotationColor = PhotoControlSettings.lineAnnotationColor;
+                    annotationPoints.add(dot);
+                    repaint();
+                }
+                else
+                {
+                    //if coordinate is not in image, then create a new grouping so if the user does come back in the image
+                    //the line does not connect from where the user left off
+                    createNewPointGrouping();
+                }
             }
         }
 

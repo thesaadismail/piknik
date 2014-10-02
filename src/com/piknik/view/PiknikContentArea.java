@@ -32,12 +32,31 @@ public class PiknikContentArea extends PiknikBasePanel {
 
         setLayout(new BorderLayout());
 
-        PhotoComponent component = new PhotoComponent(retrieveImage("android-logo.jpg"));
+    }
+
+    public void setImage(Image image)
+    {
+        //remove any existing photo components
+        removeImage();
+
+        PhotoComponent component = new PhotoComponent(image);
         JScrollPane scrollPane = new JScrollPane(component);
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public Image retrieveImage(String imageName)
+    public void removeImage()
+    {
+        //as of now only the photo component exists in border layout.center so we remove whatever is in there
+        //when removing the photo component
+        BorderLayout layout = (BorderLayout)getLayout();
+        Component component = layout.getLayoutComponent(BorderLayout.CENTER);
+        if(component!=null)
+            remove(component);
+
+        repaint();
+    }
+
+    private Image retrieveImage(String imageName)
     {
         BufferedImage originalImage = null;
         try {

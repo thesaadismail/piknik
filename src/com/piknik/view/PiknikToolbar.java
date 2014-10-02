@@ -183,16 +183,19 @@ public class PiknikToolbar extends PiknikBasePanel
         specificControlsPanel.add(controlsLabel2);
 
         //add buttons and labels for line color and text color
-        Border buttonPaddingBorder = BorderFactory.createEmptyBorder(0,5,0,0);
+        Border buttonPaddingBorder = BorderFactory.createEmptyBorder(0,0,0,0);
 
         //create line color label
         JLabel lineColorLabel = new JLabel("Line Color: ");
-        lineColorLabel.setHorizontalAlignment(JLabel.CENTER);
+        //lineColorLabel.setHorizontalAlignment(JLabel.CENTER);
         specificControlsPanel.add(lineColorLabel);
 
         //create line color button
         final JButton lineColorButton = new JButton(getHex(PhotoControlSettings.lineAnnotationColor));
         lineColorButton.setBorder(buttonPaddingBorder);
+
+        //set the button text color to be the contrast color of the background so its readable
+        lineColorButton.setForeground(getContrastColor(PhotoControlSettings.lineAnnotationColor));
 
         //set line color button background and its properties
         lineColorButton.setBackground(PhotoControlSettings.lineAnnotationColor);
@@ -206,18 +209,22 @@ public class PiknikToolbar extends PiknikBasePanel
                 PhotoControlSettings.lineAnnotationColor = selectedColor;
                 lineColorButton.setText(getHex(selectedColor));
                 lineColorButton.setBackground(selectedColor);
+                lineColorButton.setForeground(getContrastColor(selectedColor));
             }
         });
         specificControlsPanel.add(lineColorButton);
 
         //create text color label
         JLabel textColorLabel = new JLabel("Text Color: ");
-        textColorLabel.setHorizontalAlignment(JLabel.CENTER);
+        //textColorLabel.setHorizontalAlignment(JLabel.CENTER);
         specificControlsPanel.add(textColorLabel);
 
         //create text color button
         final JButton textColorButton = new JButton(getHex(PhotoControlSettings.textAnnotationColor));
         textColorButton.setBorder(buttonPaddingBorder);
+
+        //set the button text color to be the contrast color of the background so its readable
+        textColorButton.setForeground(getContrastColor(PhotoControlSettings.textAnnotationColor));
 
         //set text color button background
         textColorButton.setBackground(PhotoControlSettings.textAnnotationColor);
@@ -234,11 +241,15 @@ public class PiknikToolbar extends PiknikBasePanel
                 textColorButton.setBackground(selectedColor);
                 textColorButton.setContentAreaFilled(false);
                 textColorButton.setOpaque(true);
+                textColorButton.setForeground(getContrastColor(selectedColor));
             }
         });
         specificControlsPanel.add(textColorButton);
 
         photoControls.add(specificControlsPanel, BorderLayout.NORTH);
+
+        Border scrollPaneBorder = BorderFactory.createEmptyBorder(0,10,0,10);
+        photoControls.setBorder(scrollPaneBorder);
 
         JScrollPane photoControlsScrollPane = new JScrollPane(photoControls);
         add(photoControlsScrollPane, BorderLayout.CENTER);
@@ -271,6 +282,12 @@ public class PiknikToolbar extends PiknikBasePanel
     private String getHex(Color color)
     {
         return "#" + String.format("%06x", color.getRGB() & 0x00FFFFFF);
+    }
+
+    public static Color getContrastColor(Color color) {
+        //source: http://stackoverflow.com/a/13030061
+        double y = (299 * color.getRed() + 587 * color.getGreen() + 114 * color.getBlue()) / 1000;
+        return y >= 128 ? Color.black : Color.white;
     }
 
 }
