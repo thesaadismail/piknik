@@ -58,6 +58,8 @@ public class PhotoComponent extends JComponent
         }
     }
 
+    //draw line annotations from the lineAnnotationGroups
+    //this method takes the dots recorded and connects them together to form lines
     private void drawLineAnnotations(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
@@ -88,6 +90,7 @@ public class PhotoComponent extends JComponent
         }
     }
 
+    //draw text annotations from draw text annotation objects
     private void drawTextAnnotations(Graphics g)
     {
         Point imageCoordinates = getImageStartingCoordinates();
@@ -142,14 +145,16 @@ public class PhotoComponent extends JComponent
                             //if the new line below exceeds the image coordinates, then wrap up to the top
                             absoluteXValueForTextAnnotation = textAnnotationPoint.x + imageCoordinates.x;
                             absoluteYValueForTextAnnotation += 15;
-                            if(absoluteYValueForTextAnnotation > (image.getWidth(null) + imageCoordinates.y))
+                            if(absoluteYValueForTextAnnotation > (image.getHeight(null) + imageCoordinates.y))
                             {
                                 //only if the y value does not go before the top of the image then move the text box up
                                 //if it does go above, then do not do anything for now. this was a design decision,
                                 //as to what needs to be done if the text keeps on moving up due to size
                                 //for now i have decided to not allow the user to see the addition text he is typing.
                                 if(absoluteYValueForTextAnnotation >= imageCoordinates.y)
+                                {
                                     textAnnotation.annotationCoordinates.y = textAnnotation.annotationCoordinates.y - 15;
+                                }
                                 break;
                             }
 
@@ -162,11 +167,15 @@ public class PhotoComponent extends JComponent
                 else
                 {
                     //if the sentence is too large then go back to the starting x position and choose a new line
-                    //if the new line below exceeds the image coordinates, then wrap up to the top
                     absoluteXValueForTextAnnotation = textAnnotationPoint.x+imageCoordinates.x;
-                    if(absoluteYValueForTextAnnotation > (image.getWidth(null) + imageCoordinates.y))
+                    absoluteYValueForTextAnnotation += 15;
+                    if(absoluteYValueForTextAnnotation > (image.getHeight(null) + imageCoordinates.y))
                     {
-                        absoluteYValueForTextAnnotation = 2;
+                        if(absoluteYValueForTextAnnotation >= imageCoordinates.y)
+                        {
+                            textAnnotation.annotationCoordinates.y = textAnnotation.annotationCoordinates.y - 15;
+                        }
+                        break;
                     }
 
                     //go back an iteration to process the element again
@@ -178,6 +187,7 @@ public class PhotoComponent extends JComponent
         }
     }
 
+    //drawing a generic checkered pattern as background
     private void drawCheckeredPattern(Graphics g)
     {
         Color lightGreyCheckeredBox = new Color(0xE6E6E6);
@@ -251,6 +261,7 @@ public class PhotoComponent extends JComponent
                 (int)(getCenterY()-relativeHeightStartingPoint));
     }
 
+    //checks to see if x,y is in the image area
     private boolean isCoordinateInImage(Point coordinates)
     {
         Point imageCoordinates = getImageStartingCoordinates();
@@ -271,7 +282,10 @@ public class PhotoComponent extends JComponent
 
     private class ComponentKeyListener implements KeyListener
     {
-
+        //if key is typed then check to see if its a backspace or escape.
+        //if its backspace then backspace character and call repaint
+        //if escape is pressed then exit out of typing
+        //if its any other key, add it on to the string from the last text annotation in the list
         @Override
         public void keyTyped(KeyEvent e) {
             if(isFlipped)
@@ -343,6 +357,9 @@ public class PhotoComponent extends JComponent
         public void mouseExited(MouseEvent e) {
         }
 
+        //if mouse is clicked, check to see if its a double click
+        //if it is a double click then flip the image
+        //if its a regular click, and the image is flipped start text entry
         public void mouseClicked(MouseEvent e) {
             Point clickedPoint = new Point(e.getX(),e.getY());
             if (e.getClickCount() == 2) {
@@ -388,6 +405,10 @@ public class PhotoComponent extends JComponent
     private class ComponentMouseMotionListener implements MouseMotionListener {
 
 
+        //if mouse is dragged and image is flipped and point that the mouse was dragged to
+        //is inside the image then add it to the dot annotations list
+        //if it is not in the image then create a new grouping so when the user does come back in the image
+        //the line does not connect. (see below for comments)
         @Override
         public void mouseDragged(MouseEvent e) {
             if(isFlipped)

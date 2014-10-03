@@ -2,11 +2,8 @@ package com.piknik.view;
 
 import com.piknik.view.custom.PhotoComponent;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 
 /**
  * Created by sismail on 8/28/14.
@@ -31,9 +28,9 @@ public class PiknikContentArea extends PiknikBasePanel {
         setBackground(Color.white);
 
         setLayout(new BorderLayout());
-
     }
 
+    //set photo component in content area
     public void setImage(Image image)
     {
         //remove any existing photo components
@@ -44,6 +41,7 @@ public class PiknikContentArea extends PiknikBasePanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    //remove photo component from content area
     public void removeImage()
     {
         //as of now only the photo component exists in border layout.center so we remove whatever is in there
@@ -54,18 +52,5 @@ public class PiknikContentArea extends PiknikBasePanel {
             remove(component);
 
         repaint();
-    }
-
-    private Image retrieveImage(String imageName)
-    {
-        BufferedImage originalImage = null;
-        try {
-            InputStream imageURL = getClass().getClassLoader().getResourceAsStream("resources/"+imageName);
-            originalImage = ImageIO.read(imageURL);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return originalImage;
     }
 }
