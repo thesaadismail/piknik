@@ -266,7 +266,7 @@ public class PhotoComponent extends JComponent
     {
         Point imageCoordinates = getImageStartingCoordinates();
 
-        int topLeftX = imageCoordinates.y;
+        int topLeftX = imageCoordinates.x;
         int topRightX = imageCoordinates.x+image.getWidth(null);
 
         int topLeftY = imageCoordinates.y;
